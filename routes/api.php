@@ -26,6 +26,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     // Stripe
     Route::post('/checkout', [StripeController::class, 'checkout'])->name('api_checkout');
     Route::post('/checkout/sub', [StripeController::class, 'checkout_sub'])->name('api_checkout_sub');
+    Route::post('/sub/eliminar', [StripeController::class, 'suscripcion_finalizar'])->name('api_checkout_sub_eliminar');
 
     // Usuarios
     Route::apiResource('usuarios', ApiUsuario::class);

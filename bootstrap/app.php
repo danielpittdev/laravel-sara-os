@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'either' => App\Http\Middleware\AuthenticateEither::class,
+            'premium' => App\Http\Middleware\PaymentStatus::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

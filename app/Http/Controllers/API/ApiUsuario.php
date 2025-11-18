@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Usuario;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
@@ -15,6 +16,26 @@ class ApiUsuario extends Controller
     // Crear usuario (POST)
     public function store(Request $request): JsonResponse
     {
+        $validacion = $request->validate([
+            'nombre' => 'required|max:30',
+            'apellido' => 'required|max:50',
+            'email' => 'required|email',
+        ]);
+
+        $usuario = Usuario::create([
+            'nombre' => $request->nombre,
+            'apellido' => $request->apellido,
+            'email' => $request->email,
+            'password' => Str::random(10)
+        ]);
+
+        Mail::send('emails.avisos.registro', [
+            'user' => $usuario,
+        ], function ($message) use ($usuario) {
+            $message->to($usuario->email, $usuario->nombre . ' ' . $usuario->apellido)
+                ->subject('Registro completo');
+        });
+
         // Aquí podrías agregar validaciones reales
         return response()->json([
             'mensaje' => 'Usuario creado exitosamente',

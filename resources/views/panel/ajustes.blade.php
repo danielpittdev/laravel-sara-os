@@ -53,7 +53,7 @@
          </form>
       </div>
 
-      <div class="caja">
+      <div class="space-y-5 pb-10">
          <div class="header">
             <h2 class="font-medium text-md">Cambiar contraseña</h2>
             <p class="text-sm text-base-content/50">Cambia tu contraseña rápido.</p>
@@ -62,8 +62,6 @@
          <form id="formulario_cambiar_pass" action="{{ route('usuarios.update', ['usuario' => Auth::user()->id]) }}" method="post">
             @csrf
             @method('PUT')
-
-            <div class="text-sm border p-4 rounded-md alerta duration-500"></div>
 
             <div class="grid xl:grid-cols-6 grid-cols-1 gap-5">
                <!-- Campo -->
@@ -101,6 +99,64 @@
                </div>
             </div>
          </form>
+      </div>
+
+      <div class="space-y-5 pb-10">
+         <div class="header">
+            <h2 class="font-medium text-md">Suscripción</h2>
+            <p class="text-sm text-base-content/50">Gestiona tu suscripción.</p>
+         </div>
+
+         @php
+            $suscripcionActiva = Auth::user()->suscripcion()->where('stripe_status', 'active')->exists();
+         @endphp
+
+         @if ($suscripcionActiva)
+            <form id="formulario_cancelar_suscripcion" action="{{ route('api_checkout_sub_eliminar') }}" method="post">
+               @csrf
+
+               <!-- Campo -->
+               <div class="col-span-full mt-5">
+                  <div>
+                     <button type="submit" class="duration-300 flex justify-center rounded-md bg-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow-xs hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">Cancelar suscripción</button>
+                  </div>
+               </div>
+            </form>
+
+            <script>
+               const formulario_cancelar_suscripcion = document.getElementById('formulario_cancelar_suscripcion');
+
+               formulario_cancelar_suscripcion.addEventListener('submit', (e) => {
+                  e.preventDefault();
+                  peticion(formulario_cancelar_suscripcion, {
+                     reload: true,
+                     resetForm: true,
+                     highlightInputs: true,
+                     showAlert: false
+                  });
+               });
+            </script>
+         @else
+            <form id="form_sub" action="{{ route('api_checkout_sub') }}">
+               <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                  Activar suscripción
+               </button>
+            </form>
+
+            <script>
+               const formulario = document.getElementById('form_sub');
+
+               formulario.addEventListener('submit', (e) => {
+                  e.preventDefault();
+                  peticion(formulario, {
+                     resetForm: false,
+                     highlightInputs: true,
+                     showAlert: false,
+                  });
+               });
+            </script>
+         @endif
+
       </div>
    </div>
 @endsection

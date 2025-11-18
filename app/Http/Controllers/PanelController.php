@@ -12,6 +12,12 @@ class PanelController extends Controller
         return view('panel.inicio');
     }
 
+    // premium
+    public function premium()
+    {
+        return view('panel.premium');
+    }
+
     ### OTRAS PAGINAS ###
     // // pagina
     // public function pagina()

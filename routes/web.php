@@ -23,6 +23,7 @@ Route::get('/resetear/{token}', [WebController::class, 'resetear'])->name('reset
 Route::prefix('panel')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [PanelController::class, 'inicio'])->name('panel_inicio');
     Route::get('/usuarios', [PanelController::class, 'usuarios'])->name('panel_usuarios');
+    Route::get('/premium', [PanelController::class, 'premium'])->name('panel_premium');
     Route::get('/ajustes', [PanelController::class, 'ajustes'])->name('panel_ajustes');
 
     // Paneles singulares 

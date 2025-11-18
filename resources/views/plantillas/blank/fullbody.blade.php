@@ -10,11 +10,9 @@
    </head>
 
    <body class="h-full">
-
-      <main class="p-3">
-         @yield('contenido')
-      </main>
-
+      @yield('contenido')
    </body>
+
+   @yield('scripts')
 
 </html>
