@@ -1,0 +1,43 @@
+@import 'tailwindcss';
+@plugin "daisyui";
+
+@plugin "daisyui" {
+    themes: all;
+}
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+.box {
+    border: 1px solid color-mix(in oklab, var(--color-base-content) 10%, rgb(0, 0, 0) 0%);
+    box-shadow: 1px 1px 5px 1px var(--color-base-300);
+    background-color: var(--color-base-100);
+}
+
+fieldset {
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    cursor: pointer;
+}
+
+.alerta {
+    transform: translateY(10px);
+    opacity: 0;
+    margin: 0px 0;
+}
+
+.alerta.active {
+    transform: translateY(0);
+    opacity: 100;
+    margin: 35px 0;
+}

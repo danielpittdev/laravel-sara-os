@@ -1,0 +1,109 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Models\Usuario;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+
+class ApiUsuario extends Controller
+{
+    // Crear usuario (POST)
+    public function store(Request $request): JsonResponse
+    {
+        // Aquí podrías agregar validaciones reales
+        return response()->json([
+            'mensaje' => 'Usuario creado exitosamente',
+            'datos' => [],
+            'success' => true,
+        ], 201);
+    }
+
+    // Actualizar usuario (PUT/PATCH)
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $usuario = Usuario::find($id);
+
+        if (!$usuario) {
+            return response()->json([
+                'mensaje' => 'Usuario no encontrado',
+                'success' => false,
+            ], 404);
+        }
+
+        if ($usuario->id !== Auth::id()) {
+            return response()->json([
+                'mensaje' => 'No tienes permisos para actualizar este usuario',
+                'success' => false,
+            ], 403);
+        }
+
+        // Cambio de contraseña
+        if ($request->filled('current_password')) {
+            $validated = $request->validate([
+                'current_password' => 'required|string|min:8|max:20',
+                'password' => 'required|string|min:8|max:20|confirmed',
+            ], [
+                'current_password.required' => 'La contraseña actual es obligatoria',
+                'password.required' => 'La nueva contraseña es obligatoria',
+                'password.min' => 'Debe contener al menos 8 caracteres',
+                'password.max' => 'Debe contener entre 8 y 20 caracteres',
+                'password.confirmed' => 'La confirmación de la contraseña no coincide',
+            ]);
+
+            if (!Hash::check($validated['current_password'], $usuario->password)) {
+                return response()->json([
+                    'mensaje' => 'La contraseña actual no es correcta',
+                    'success' => false,
+                ], 422);
+            }
+
+            $usuario->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            // Aviso por email
+            Mail::send('emails.avisos.cambio-contrasena', ['user' => $usuario], function ($message) use ($usuario) {
+                $message->to($usuario->email, $usuario->nombre . ' ' . $usuario->apellido)
+                    ->subject('Cambio de contraseña');
+            });
+
+            return response()->json([
+                'mensaje' => 'Contraseña actualizada correctamente',
+                'datos' => ['id' => $usuario->id],
+                'success' => true,
+            ], 200);
+        }
+
+        // Actualizar nombre/apellido
+        if ($request->filled('nombre') || $request->filled('apellido')) {
+            $validated = $request->validate([
+                'nombre' => 'required|string',
+                'apellido' => 'required|string',
+            ], [
+                'nombre.required' => 'El nombre es obligatorio',
+                'apellido.required' => 'El apellido es obligatorio',
+            ]);
+
+            $validated = array_map(fn($v) => ucfirst($v), $validated);
+
+            $usuario->update($validated);
+
+            return response()->json([
+                'mensaje' => 'Datos del usuario actualizados correctamente',
+                'datos' => $validated,
+                'success' => true,
+            ], 200);
+        }
+
+        return response()->json([
+            'mensaje' => 'No se realizaron cambios',
+            'datos' => null,
+            'success' => true,
+        ], 200);
+    }
+}

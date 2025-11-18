@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(npm run dev:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(composer:*)",
+      "Bash(php artisan vendor:publish:*)",
+      "Bash(php artisan:*)",
+      "Bash(tree:*)",
+      "Bash(xargs ls:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(mkcert -install:*)",
+      "Bash(mkcert:*)",
+      "Read(//private/etc/**)",
+      "Read(//Users/daniel/Library/Application Support/mkcert/**)",
+      "Bash(sudo -S mkcert -install:*)",
+      "Bash(security find-certificate:*)",
+      "Bash(awk:*)",
+      "Read(//Users/daniel/**)",
+      "Bash(curl -sk https://vitalic.local)",
+      "Bash(curl -sk https://vitalic.local:5191)",
+      "Bash(curl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
