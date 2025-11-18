@@ -1,7 +1,7 @@
 @php
    $paginas = [
        'inicio' => ['ruta' => 'panel_inicio', 'icono' => 'mdi-home'],
-       'usuarios' => ['ruta' => 'panel_usuarios', 'icono' => 'mdi-account-cog'],
+       'usuarios' => ['ruta' => 'panel_usuarios', 'icono' => 'mdi-home'],
    ];
 @endphp
 
@@ -23,7 +23,7 @@
             <!-- Sidebar component, swap this element with another sidebar if you like -->
             <div class="relative flex grow flex-col gap-y-5 overflow-y-auto bg-base-100 px-6 pb-2 ring-1 ring-white/10">
                <div class="relative flex h-16 shrink-0 items-center">
-                  <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" class="h-8 w-auto" />
+                  <img src="{{ asset('/logo/main.svg') }}" alt="{{ env('APP_NAME') }}" class="h-8 w-auto" />
                </div>
                <nav class="flex flex-1 flex-col">
                   <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -74,9 +74,11 @@
 <!-- Static sidebar for desktop -->
 <div class="hidden bg-base-100 lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
    <!-- Sidebar component, swap this element with another sidebar if you like -->
-   <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 px-6">
+   <div class="flex grow flex-col gap-y-5 overflow-y-auto border-r border-base-content/10 px-6">
       <div class="flex h-16 shrink-0 items-center">
-         <img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" class="h-8 w-auto" />
+         <a href="{{ route('panel_inicio') }}">
+            <img src="{{ asset('/logo/main.svg') }}" alt="{{ env('APP_NAME') }}" class="h-8 w-auto" />
+         </a>
       </div>
       <nav class="flex flex-1 flex-col">
          <ul role="list" class="flex flex-1 flex-col gap-y-7">
@@ -86,7 +88,7 @@
                   @foreach ($paginas as $pagina => $param)
                      <li>
                         <a href="{{ route($param['ruta']) }}"
-                           class="{{ request()->routeIs($param['ruta']) ? 'bg-base-content/3 hover:bg-base-content/5 text-base-content/50' : 'hover:bg-base-content/5' }} group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-base-content">
+                           class="{{ request()->routeIs($param['ruta']) ? 'text-base-content' : 'text-base-content/60' }} hover:bg-base-content/5 hover:pl-2.5 duration-200 group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold">
                            {{ ucfirst($pagina) }}
                         </a>
                      </li>

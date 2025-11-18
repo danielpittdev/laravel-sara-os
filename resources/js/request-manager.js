@@ -17,8 +17,8 @@ export default async function peticion(form, config = {}) {
 
   // Limpieza previa de inputs con errores
   if (config.highlightInputs) {
-    form.querySelectorAll('input, select, textarea').forEach(input => {
-      input.classList.remove('border-red-500', 'bg-red-50');
+    form.querySelectorAll('input, el-select, textarea').forEach(input => {
+      input.classList.remove('bg-red-500/20', 'border-red-600/20');
       const nextMsg = input.nextElementSibling;
       if (nextMsg?.classList.contains('input-error-msg')) nextMsg.remove();
     });
@@ -64,7 +64,7 @@ export default async function peticion(form, config = {}) {
     }
 
     const responseData = err.response?.data;
-    if (alerta) alerta.classList.add('active', 'bg-red-50', 'border-red-600/20');
+    if (alerta) alerta.classList.add('active', 'bg-red-500/20', 'border-red-600/20');
 
     if (err.response?.status === 422) {
       const errors = responseData.errores || responseData.errors || {};
@@ -76,7 +76,7 @@ export default async function peticion(form, config = {}) {
           const escapedName = fieldName.replace(/([[\].])/g, '\\$1');
           const input = form.querySelector(`[name="${escapedName}"]`);
           if (input) {
-            input.classList.add('border-red-500', 'bg-red-50');
+            input.classList.add('border-red-600/20', 'bg-red-500/20');
 
             const errorMsg = document.createElement('p');
             errorMsg.className = 'input-error-msg text-red-600 text-sm mt-1';
@@ -87,7 +87,7 @@ export default async function peticion(form, config = {}) {
       }
     } else {
       const msg = responseData?.mensaje ?? 'Ha ocurrido un error';
-      if (alerta) alerta.innerHTML = `<p class="text-red-700">${msg}</p>`;
+      if (alerta) alerta.innerHTML = `<p class="text-red-500">${msg}</p>`;
     }
   }
 }

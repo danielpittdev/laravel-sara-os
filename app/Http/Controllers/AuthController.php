@@ -21,10 +21,7 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-
-    /**
-     * Procesar login
-     */
+    // Login de usuario
     public function login(Request $request)
     {
         try {
@@ -92,9 +89,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Procesar registro
-     */
+    // Registro de usuario
     public function registro(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -154,9 +149,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Cerrar sesión
-     */
+    // Cerrar sesión
     public function logout(Request $request)
     {
         try {
@@ -193,9 +186,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Enviar enlace de recuperación de contraseña
-     */
+    // Recuperación
     public function recuperar(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -260,9 +251,7 @@ class AuthController extends Controller
         }
     }
 
-    /**
-     * Restablecer contraseña
-     */
+    // Restablecer
     public function resetear(Request $request)
     {
         $validator = Validator::make($request->all(), [
