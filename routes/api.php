@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\API\ApiUsuario;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StripeController;
 
 Route::prefix('auth')->middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('post_login');
@@ -21,6 +22,13 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     /* TEST */
     Route::post('/test', [ApiController::class, 'test'])->name('api_test');
 
+    // Stripe
+    Route::post('/checkout', [StripeController::class, 'checkout'])->name('api_checkout');
+    Route::post('/checkout/sub', [StripeController::class, 'checkout_sub'])->name('api_checkout_sub');
+
     // Usuarios
     Route::apiResource('usuarios', ApiUsuario::class);
 });
+
+// Stripe Webhook
+Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
