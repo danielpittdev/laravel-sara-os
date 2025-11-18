@@ -8,6 +8,7 @@ use App\Http\Controllers\ApiController;
 use App\Http\Controllers\API\ApiUsuario;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\StripeWebhookController;
 
 Route::prefix('auth')->middleware('web')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('post_login');
@@ -31,4 +32,4 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 });
 
 // Stripe Webhook
-Route::post('/stripe/webhook', [StripeController::class, 'webhook']);
+Route::post('webhook', [StripeWebhookController::class, 'handleWebhook']);

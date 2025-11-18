@@ -34,5 +34,4 @@ Route::prefix('panel')->middleware('auth:sanctum')->group(function () {
 // Rutas de recursos
 Route::prefix('res')->middleware('either')->group(function () {
     Route::post('/cerrar-sesion', [AuthController::class, 'logout'])->name('cerrar_sesion');
-    Route::post('/busqueda', [RecursosController::class, 'busqueda'])->name('busqueda');
 });

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Usuario;
+use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,5 +23,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         URL::forceHttps('true');
+        Cashier::useCustomerModel(Usuario::class);
     }
 }
