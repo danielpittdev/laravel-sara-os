@@ -80,7 +80,7 @@ class StripeController extends Controller
 
         // 1) Resolver el price_id
         // $stripePriceId = $validated['stripe_price_id'] ?? null;
-        $stripePriceId = 'price_1Ryb8qDby92PFs9n7ED8uRm0';
+        $stripePriceId = 'price_1SVVmMDKXimljh5PkiWzeZGz';
 
         if (! $stripePriceId && ! empty($validated['plan_id'])) {
             // Ejemplo: Plan con campo stripe_price_id
