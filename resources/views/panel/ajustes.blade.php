@@ -103,7 +103,7 @@
 
       <div class="space-y-5 pb-10">
          <div class="header">
-            <h2 class="font-medium text-md">Suscripciónn</h2>
+            <h2 class="font-medium text-md">Suscripción</h2>
             <p class="text-sm text-base-content/50">Gestiona tu suscripción.</p>
          </div>
 
