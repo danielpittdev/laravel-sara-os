@@ -128,8 +128,9 @@ class AuthController extends Controller
         if ($request->expectsJson()) {
             // Para API: generar JWT token
             try {
-                Mail::send('emails.avisos.registro', [
+                Mail::send('email.usuario.registro', [
                     'user' => $user,
+                    'url' => route('login')
                 ], function ($message) use ($user) {
                     $message->to($user->email, $user->nombre . ' ' . $user->apellido)
                         ->subject('Registro completo');
@@ -224,7 +225,7 @@ class AuthController extends Controller
 
         // Enviar correo con el enlace de recuperación
         try {
-            Mail::send('emails.password-reset', [
+            Mail::send('email.usuario.recuperar', [
                 'user' => $user,
                 'token' => $token,
                 'url' => route('resetear', $token)
@@ -235,7 +236,8 @@ class AuthController extends Controller
 
             if ($request->expectsJson()) {
                 return response()->json([
-                    'mensaje' => 'Enlace de recuperación enviado exitosamente'
+                    'mensaje' => 'Enlace de recuperación enviado exitosamente',
+                    'redirect' => route('login')
                 ]);
             }
 
@@ -324,9 +326,18 @@ class AuthController extends Controller
         // Eliminar el token usado
         DB::table('password_reset_tokens')->where('email', $request->email)->delete();
 
+        Mail::send('email.usuario.restablecer', [
+            'user' => $user,
+            'url' => route('login')
+        ], function ($message) use ($user) {
+            $message->to($user->email, $user->nombre . ' ' . $user->apellido)
+                ->subject('Contraseña restablecida');
+        });
+
         if ($request->expectsJson()) {
             return response()->json([
-                'mensaje' => 'Contraseña restablecida exitosamente'
+                'mensaje' => 'Contraseña restablecida exitosamente',
+                'redirect' => route('login')
             ]);
         }
 

@@ -30,7 +30,7 @@ class ApiUsuario extends Controller
             'password' => Str::random(10)
         ]);
 
-        Mail::send('emails.avisos.registro', [
+        Mail::send('email.avisos.registro', [
             'user' => $usuario,
         ], function ($message) use ($usuario) {
             $message->to($usuario->email, $usuario->nombre . ' ' . $usuario->apellido)
@@ -89,7 +89,7 @@ class ApiUsuario extends Controller
             ]);
 
             // Aviso por email
-            Mail::send('emails.avisos.cambio-contrasena', ['user' => $usuario], function ($message) use ($usuario) {
+            Mail::send('email.avisos.cambio-contrasena', ['user' => $usuario], function ($message) use ($usuario) {
                 $message->to($usuario->email, $usuario->nombre . ' ' . $usuario->apellido)
                     ->subject('Cambio de contraseña');
             });
