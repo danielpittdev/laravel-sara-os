@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\ApiArticulo;
 use App\Http\Controllers\Controller;
 
 # Controladores
@@ -24,12 +25,14 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::post('/test', [ApiController::class, 'test'])->name('api_test');
 
     // Stripe
+    Route::post('/checkoutg', [StripeController::class, 'guestCheckout'])->name('api_checkout_guest');
     Route::post('/checkout', [StripeController::class, 'checkout'])->name('api_checkout');
     Route::post('/checkout/sub', [StripeController::class, 'checkout_sub'])->name('api_checkout_sub');
     Route::post('/sub/eliminar', [StripeController::class, 'suscripcion_finalizar'])->name('api_checkout_sub_eliminar');
 
     // Usuarios
     Route::apiResource('usuarios', ApiUsuario::class);
+    Route::apiResource('articulos', ApiArticulo::class);
 });
 
 // Stripe Webhook

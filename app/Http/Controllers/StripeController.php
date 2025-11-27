@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Stripe\Stripe;
 use App\Models\Plan;
+use App\Models\Pedido;
 use App\Models\Usuario;
+use App\Models\Articulo;
 use App\Models\Producto;
 use App\Models\Suscripcion;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Stripe\Checkout\Session;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Stripe\Subscription as StripeSubscription;
@@ -36,7 +40,7 @@ class StripeController extends Controller
 
         if (! $stripePriceId && ! empty($validated['producto_id'])) {
             // EJEMPLO: producto con campo stripe_price_id
-            $producto = Producto::findOrFail($validated['producto_id']);
+            $producto = Articulo::findOrFail($validated['producto_id']);
             $stripePriceId = $producto->stripe_price_id;
         }
 
@@ -54,7 +58,7 @@ class StripeController extends Controller
                 'success_url' => route('panel_inicio') . '?session_id={CHECKOUT_SESSION_ID}',
                 'cancel_url'  => route('panel_inicio'),
                 // Aquí puedes mandar metadata para enlazar con tu pedido interno
-                'metadata'    => ['order_id' => $pedido->id ?? null],
+                'metadata'    => ['articulo' => $articulo ?? null],
             ]
         );
 
@@ -62,6 +66,71 @@ class StripeController extends Controller
             'redirect' => $checkout->url, // Stripe Checkout URL
         ]);
     }
+
+    public function guestCheckout(Request $request)
+    {
+        $validar = $request->validate([
+            'articulos' => 'required|array|min:1',
+            'articulos.*' => 'required|uuid|exists:articulos,uuid',
+            'nombre_com' => 'required|string|max:100',
+            'direccion_com' => 'required|string|max:100',
+            'codigo_postal_com' => 'required|string|max:100',
+            'email' => 'required|email',
+        ]);
+
+        $articulos = Articulo::whereIn('uuid', $request->articulos)->get();
+
+        if ($articulos->isEmpty()) {
+            return response()->json(['error' => 'No se encontraron artículos válidos.'], 422);
+        }
+
+        // Stripe requiere los precios en centavos
+        $lineItems = [];
+
+        foreach ($articulos as $articulo) {
+            $lineItems[] = [
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => [
+                        'name' => $articulo->nombre,
+                    ],
+                    'unit_amount' => intval($articulo->precio * 100),
+                ],
+                'quantity' => 1,
+            ];
+        }
+
+        $pedido_uuid = Str::uuid();
+
+        $pedido = Pedido::create([
+            'uuid' => $pedido_uuid,
+            'carrito' => $articulos->toJson(), // ✅ corregido
+            'total' => $articulos->sum('precio'), // opcional: guarda el total
+            'nombre_com' => $request->nombre_com,
+            'direccion_com' => $request->direccion_com,
+            'codigo_postal_com' => $request->codigo_postal_com,
+        ]);
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => $lineItems,
+            'mode' => 'payment',
+            'customer_email' => $request->email,
+            'success_url' => route('panel_inicio') . '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => route('panel_inicio'),
+            'metadata' => [
+                'pedido_id' => (string) $pedido_uuid, // CAST explícito
+                'email' => $request->email,
+            ],
+        ]);
+
+        return response()->json([
+            'redirect' => $session->url,
+        ]);
+    }
+
 
     public function checkout_sub(Request $request)
     {

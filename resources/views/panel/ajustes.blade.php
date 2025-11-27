@@ -202,7 +202,6 @@
       </div>
 
       <div class="space-y-5 pb-10">
-
          <form id="form_log_out" action="{{ route('cerrar_sesion') }}" method="post">
             @csrf
 
@@ -213,8 +212,6 @@
                </div>
             </div>
          </form>
-
-
       </div>
    </div>
 @endsection

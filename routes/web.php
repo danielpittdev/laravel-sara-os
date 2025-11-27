@@ -7,6 +7,7 @@ use App\Http\Controllers\WebController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PanelController;
 use App\Http\Controllers\SingleController;
+use App\Http\Controllers\StripeController;
 use App\Http\Controllers\RecursosController;
 
 // WEB
@@ -18,6 +19,9 @@ Route::get('/login', [WebController::class, 'login'])->name('login');
 Route::get('/registro', [WebController::class, 'registro'])->name('registro');
 Route::get('/recuperar', [WebController::class, 'recuperar'])->name('recuperar');
 Route::get('/resetear/{token}', [WebController::class, 'resetear'])->name('resetear');
+
+// Procesar compra
+Route::post('/checkout', [StripeController::class, 'guestCheckout'])->name('api_checkout_guest');
 
 // PANEL - Protegido con autenticación
 Route::prefix('panel')->middleware('auth:sanctum')->group(function () {

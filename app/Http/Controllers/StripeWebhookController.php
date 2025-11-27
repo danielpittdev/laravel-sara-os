@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Articulo;
+use Stripe\Webhook;
+use App\Models\Pedido;
 use App\Models\Usuario;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Http\Controllers\WebhookController as CashierWebhookController;
 
 class StripeWebhookController extends CashierWebhookController
@@ -44,29 +49,44 @@ class StripeWebhookController extends CashierWebhookController
 
         // 🔀 AQUÍ tu lógica central, TODO en un switch
         switch ($type) {
-
             case 'checkout.session.completed':
-                // $object es \Stripe\Checkout\Session
-                $mode     = $object->mode; // 'payment' o 'subscription'
-                $metadata = (array) ($object->metadata ?? []);
+                $metadata = $object->metadata?->toArray() ?? [];
 
-                if ($usuario) {
-                    if ($mode === 'payment') {
-                        // ✅ PAGO ÚNICO COMPLETADO
-                        // Ejemplo: marcar pedido como pagado
-                        //
-                        // $orderId = $metadata['order_id'] ?? null;
-                        // Pedido::where('id', $orderId)->update([
-                        //     'estado'  => 'pagado',
-                        //     'paid_at' => now(),
-                        // ]);
-                        //
-                        Log::info("Pago único OK (checkout.session.completed) usuario={$usuario->id}");
-                    } elseif ($mode === 'subscription') {
-                        // ✅ SUSCRIPCIÓN creada vía Checkout
-                        Log::info("Suscripción vía Checkout completada usuario={$usuario->id}");
-                    }
+                Log::info('Metadata decodificado', $metadata);
+
+                if (!isset($metadata['pedido_id'])) {
+                    Log::warning('checkout.session.completed sin pedido_id en metadata');
+                    break;
                 }
+
+                $pedido_id = $metadata['pedido_id'];
+                $pedido = Pedido::where('uuid', $pedido_id)->first();
+
+                if (!$pedido) {
+                    Log::warning("Pedido no encontrado con UUID={$pedido_id}");
+                    break;
+                }
+
+                $pedido->update([
+                    'estado' => 'procesado'
+                ]);
+
+                $email = $metadata['email'] ?? null;
+
+                if ($email) {
+                    Mail::send('emails.avisos.compra', [
+                        'pedido' => $pedido,
+                        'carrito' => json_decode($pedido->carrito),
+                    ], function ($message) use ($pedido, $email) {
+                        $message->to($email, $pedido->nombre_com)
+                            ->subject('Compra realizada');
+                    });
+                } else {
+                    Log::warning("Email no encontrado en metadata para pedido {$pedido_id}");
+                }
+
+
+                Log::info("Pedido marcado como procesado. UUID={$pedido_id}");
                 break;
 
             case 'invoice.payment_succeeded':
@@ -77,15 +97,6 @@ class StripeWebhookController extends CashierWebhookController
                     $invId    = $object->id ?? null;
 
                     // Ejemplo de registro rápido:
-                    // Pago::create([
-                    //     'usuario_id'        => $usuario->id,
-                    //     'stripe_invoice_id' => $invId,
-                    //     'monto'             => $amount / 100,
-                    //     'moneda'            => strtoupper($currency),
-                    //     'tipo'              => 'suscripcion',
-                    //     'pagado_en'         => now(),
-                    // ]);
-
                     Log::info("invoice.payment_succeeded usuario={$usuario->id} invoice={$invId}");
                 }
                 break;
