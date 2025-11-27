@@ -23,6 +23,7 @@ class Usuario extends Authenticatable
         'apellido',
         'email',
         'password',
+        'avatar',
         'stripe_id',
         'pm_type',
         'pm_last_four',

@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class ApiUsuario extends Controller
 {
@@ -105,20 +106,37 @@ class ApiUsuario extends Controller
             $validated = $request->validate([
                 'nombre' => 'required|string',
                 'apellido' => 'required|string',
+                'avatar' => 'sometimes|mimes:png,jpeg,jpg|max:5024',
             ], [
                 'nombre.required' => 'El nombre es obligatorio',
                 'apellido.required' => 'El apellido es obligatorio',
+                'avatar.mimes' => 'Formato no compatible',
             ]);
 
-            $validated = array_map(fn($v) => ucfirst($v), $validated);
+            // Capitalizar nombre y apellido
+            $validated['nombre'] = ucfirst($validated['nombre']);
+            $validated['apellido'] = ucfirst($validated['apellido']);
 
+            // Procesar avatar si se sube
+            if ($request->hasFile('avatar')) {
+                // Eliminar anterior si existe
+                if ($usuario->avatar && Storage::exists($usuario->avatar)) {
+                    Storage::delete($usuario->avatar);
+                }
+
+                // Guardar el nuevo avatar
+                $ruta = $request->file('avatar')->store('avatars'); // Guarda en storage/app/avatars
+                $validated['avatar'] = $ruta;
+            }
+
+            // Actualizar usuario
             $usuario->update($validated);
 
             return response()->json([
                 'mensaje' => 'Datos del usuario actualizados correctamente',
                 'datos' => $validated,
                 'success' => true,
-            ], 200);
+            ]);
         }
 
         return response()->json([
